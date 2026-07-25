@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Invictus Student Council — Election</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#152A4E;--navy-2:#1E3A66;--red:#E63558;--red-dark:#C42546;
+  --bg:#F1F4F9;--surface:#FFFFFF;--ink:#152A4E;--slate:#5E6E8A;--line:#DBE2ED;--green:#12915E;
+  --shadow:0 2px 4px rgba(21,42,78,.05), 0 18px 44px -24px rgba(21,42,78,.35);
+  --head:'Poppins',system-ui,sans-serif;--body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;font-size:16px;display:flex;flex-direction:column;min-height:100vh}
+h1,h2,h3,h4{font-family:var(--head);margin:0;letter-spacing:-.01em}
+button{font-family:var(--body);cursor:pointer;border:none}
+.hidden{display:none!important}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topbar-in{display:flex;align-items:center;gap:12px;height:60px;max-width:1000px;margin:0 auto;padding:0 20px}
+.brandlogo{display:flex;align-items:center;gap:9px}
+.brandlogo svg{flex-shrink:0;display:block}
+.brandlogo .wm{font-family:var(--head);font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1}
+.brandlogo .wm b{color:var(--navy);font-weight:800}
+.brandlogo .wm em{color:var(--red);font-style:normal;font-weight:800}
+footer.app-foot{background:var(--navy);color:#AEBDD4;padding:34px 0 30px;margin-top:auto}
+footer.app-foot .fin{max-width:1000px;margin:0 auto;padding:0 20px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
+footer.app-foot .fbrand{font-family:var(--head);font-weight:800;font-size:20px;letter-spacing:-.02em;color:#fff}
+footer.app-foot .fbrand em{color:var(--red);font-style:normal}
+footer.app-foot .fright{text-align:right;font-size:13px;line-height:1.6}
+footer.app-foot .fright b{color:#fff;font-family:var(--head);font-weight:700;font-size:14px}
+footer.app-foot .fright span{color:#E63558;font-weight:600}
+@media(max-width:560px){footer.app-foot .fin{flex-direction:column;align-items:flex-start}footer.app-foot .fright{text-align:left}}
+.council{margin-left:auto;font-family:var(--head);font-weight:700;font-size:12px;color:var(--slate);text-align:right;line-height:1.2}
+.council span{color:var(--red)}
+.admin-link{margin-left:14px;background:var(--bg);border:1px solid var(--line);color:var(--slate);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600}
+.admin-link:hover{color:var(--ink)}
+.sync{margin-left:8px;font-size:11px;color:var(--slate);font-family:var(--head);font-weight:600;display:flex;align-items:center;gap:5px}
+.sync .d{width:8px;height:8px;border-radius:50%;background:#C6D0E0}
+.sync.ok .d{background:var(--green)}
+.sync.err .d{background:var(--red)}
+#idle{min-height:calc(100% - 60px);display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 20px}
+.idle-card{max-width:620px}
+.vote-word{font-family:var(--head);font-weight:800;font-size:clamp(70px,18vw,150px);color:var(--navy);line-height:.9;letter-spacing:-.03em}
+.ribbon{display:inline-block;background:var(--red);color:#fff;font-family:var(--head);font-weight:700;font-size:clamp(13px,3vw,18px);letter-spacing:.14em;padding:9px 22px;border-radius:6px;margin:14px 0 4px;text-transform:uppercase}
+.idle-sub{font-family:var(--head);font-weight:700;font-size:clamp(20px,5vw,32px);color:var(--navy);letter-spacing:.02em}
+.idle-lead{color:var(--slate);font-size:16px;margin:22px auto 30px;max-width:44ch}
+.begin{background:var(--navy);color:#fff;font-family:var(--head);font-weight:700;font-size:20px;padding:18px 46px;border-radius:14px;box-shadow:var(--shadow)}
+.begin:hover{background:var(--navy-2)}.begin:active{transform:translateY(1px)}
+.closed-note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:12px;padding:20px 24px;color:var(--ink);font-weight:500;max-width:440px;margin:0 auto}
+#ballot{padding:26px 0 120px}
+.step-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:6px;flex-wrap:wrap}
+.step-kicker{font-family:var(--head);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--red)}
+.step-head h2{font-size:clamp(28px,6vw,44px);color:var(--navy);line-height:1.05}
+.step-grade{font-family:var(--head);font-weight:600;font-size:15px;color:var(--slate)}
+.step-count{font-family:var(--head);font-weight:700;color:var(--slate);font-size:14px;white-space:nowrap}
+.pbar{height:8px;background:#E1E7F1;border-radius:99px;overflow:hidden;margin:16px 0 26px}
+.pbar>div{height:100%;background:linear-gradient(90deg,var(--red),var(--navy));width:0;transition:width .35s ease;border-radius:99px}
+.cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.cand{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px;text-align:center;box-shadow:var(--shadow);transition:.15s;position:relative;overflow:hidden}
+.cand:hover{border-color:#B9C6DA;transform:translateY(-2px)}
+.cand.sel{border-color:var(--red);box-shadow:0 0 0 4px rgba(230,53,88,.14),var(--shadow)}
+.cand .photo{width:100%;aspect-ratio:1/1;border-radius:14px;object-fit:cover;background:#EDF1F7;display:block}
+.cand .ph-fallback{width:100%;aspect-ratio:1/1;border-radius:14px;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:40px;color:#fff}
+.cand .nm{font-family:var(--head);font-weight:700;font-size:17px;margin-top:12px;color:var(--ink);line-height:1.15}
+.cand .check{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;display:none;place-items:center;font-size:16px;box-shadow:0 4px 10px rgba(230,53,88,.4)}
+.cand.sel .check{display:grid}
+.navbar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:15}
+.navbar-in{max-width:1000px;margin:0 auto;padding:14px 20px;display:flex;gap:12px;align-items:center}
+.btn{border-radius:12px;font-family:var(--head);font-weight:700;font-size:16px;padding:14px 26px}
+.btn-primary{background:var(--red);color:#fff}.btn-primary:hover{background:var(--red-dark)}
+.btn-primary:disabled{background:#E7B4C1;cursor:not-allowed}
+.btn-ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}.btn-ghost:hover{border-color:#B9C6DA}
+.nav-spacer{flex:1}.nav-hint{color:var(--slate);font-size:13px;font-weight:500}
+#review{padding:30px 0 120px}
+.review-list{display:grid;gap:12px;margin-top:20px}
+.review-row{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.review-row .rp{width:48px;height:48px;border-radius:10px;object-fit:cover;background:#EDF1F7}
+.review-row .rp-fb{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;font-family:var(--head);font-weight:800;color:#fff;font-size:18px}
+.review-row .meta{flex:1}
+.review-row .post{font-size:12px;color:var(--slate);font-family:var(--head);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.review-row .who{font-family:var(--head);font-weight:700;font-size:18px;color:var(--ink)}
+.review-row .who.none{color:var(--red)}
+.review-row .edit{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--slate)}
+#done{min-height:calc(100% - 60px);display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 20px}
+.done-card{max-width:480px}
+.done-tick{width:96px;height:96px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:52px;margin:0 auto 24px;box-shadow:0 12px 30px -8px rgba(18,145,94,.5)}
+.done-card h2{font-size:40px;color:var(--navy)}
+.done-card .finger{background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:12px;padding:16px 20px;margin:22px 0;font-weight:600;color:var(--ink)}
+.done-card .auto{color:var(--slate);font-size:14px}
+#admin{padding:26px 0 80px}
+.admin-head{display:flex;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.admin-head h2{font-size:30px;color:var(--navy)}
+.tabs{display:flex;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:22px;flex-wrap:wrap}
+.tab{background:transparent;border-radius:8px;padding:9px 16px;font-family:var(--head);font-weight:600;font-size:14px;color:var(--slate)}
+.tab.on{background:var(--navy);color:#fff}
+.panel{display:none}.panel.on{display:block}
+.card2{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+.card2 h3{font-size:19px;color:var(--navy);margin-bottom:6px}
+.card2 .muted{color:var(--slate);font-size:14px;margin:0 0 16px}
+.toggle-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.switch{position:relative;width:60px;height:32px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#C6D0E0;border-radius:99px;transition:.2s}
+.slider::before{content:"";position:absolute;width:26px;height:26px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.switch input:checked + .slider{background:var(--green)}
+.switch input:checked + .slider::before{transform:translateX(28px)}
+.state-label{font-family:var(--head);font-weight:700;font-size:17px}
+.state-label.open{color:var(--green)}.state-label.closed{color:var(--red)}
+label.fld{display:block;font-size:13px;font-weight:600;color:var(--slate);margin-bottom:6px}
+input[type=text],input[type=password],input[type=number],select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-family:var(--body);font-size:15px;background:#F7F9FC;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-sm{border-radius:9px;font-family:var(--head);font-weight:600;font-size:14px;padding:10px 16px}
+.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:var(--navy-2)}
+.btn-line{background:var(--bg);border:1px solid var(--line);color:var(--ink)}.btn-line:hover{border-color:#B9C6DA}
+.btn-danger{background:#FDECEF;border:1px solid #F5C6D0;color:var(--red-dark)}.btn-danger:hover{background:#FBDCE2}
+.post-block{border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.post-block>.ph{background:#F7F9FC;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.post-block .ph .t{font-family:var(--head);font-weight:700;font-size:16px;color:var(--navy);flex:1;min-width:160px}
+.post-block .ph .g{font-size:12px;color:var(--slate);font-weight:600}
+.cand-admin{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;padding:14px 16px}
+.ca{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:8px;background:#fff}
+.ca .cap{width:46px;height:46px;border-radius:9px;object-fit:cover;background:#EDF1F7;flex-shrink:0}
+.ca .cap-fb{width:46px;height:46px;border-radius:9px;display:grid;place-items:center;font-family:var(--head);font-weight:800;color:#fff;font-size:16px;flex-shrink:0}
+.ca .cn{flex:1;font-weight:600;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ca .up{background:var(--bg);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;padding:6px 8px;color:var(--slate)}
+.ca .del{background:none;color:#C0A0A8;font-size:18px;padding:2px 6px}.ca .del:hover{color:var(--red)}
+.add-cand{display:flex;gap:8px;padding:0 16px 16px;flex-wrap:wrap}
+.add-cand input{flex:1;min-width:160px}
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+.stat-box .n{font-family:var(--head);font-weight:800;font-size:32px;color:var(--navy)}
+.stat-box .l{font-size:13px;color:var(--slate)}
+.res-post{margin-bottom:26px}
+.res-post h3{font-size:19px;color:var(--navy);margin-bottom:4px}
+.res-post .rg{font-size:13px;color:var(--slate);font-weight:600;margin-bottom:14px}
+.res-bar{margin-bottom:12px}
+.res-bar .rl{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}
+.res-bar .rl .rn{font-weight:600}
+.res-bar .rl .rn .win{color:var(--green);font-weight:700;margin-left:6px;font-family:var(--head);font-size:12px}
+.res-bar .rl .rv{font-family:var(--head);font-weight:700;color:var(--slate)}
+.res-track{height:22px;background:#EAEFF6;border-radius:8px;overflow:hidden}
+.res-fill{height:100%;border-radius:8px;background:var(--navy);transition:width .5s ease;min-width:2px}
+.res-fill.win{background:var(--green)}
+.empty{color:var(--slate);text-align:center;padding:40px;font-size:15px}
+.modal-bg{position:fixed;inset:0;background:rgba(21,42,78,.5);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:16px;padding:26px;max-width:380px;width:100%;box-shadow:0 30px 60px -20px rgba(0,0,0,.4)}
+.modal h3{font-size:20px;color:var(--navy);margin-bottom:8px}
+.modal p{color:var(--slate);font-size:14px;margin:0 0 16px}
+.modal-actions{display:flex;gap:10px;margin-top:18px}
+.modal-actions .btn-sm{flex:1;text-align:center}
+.pin-error{color:var(--red);font-size:13px;font-weight:600;margin-top:8px;display:none}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:12px;font-weight:600;font-size:14px;z-index:100;transition:.3s;box-shadow:var(--shadow);opacity:0}
+.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+.setup-warn{background:#FFF6E5;border:1px solid #F2D99B;border-radius:12px;padding:16px 20px;color:#7A5A15;font-size:14px;margin:20px auto;max-width:560px}
+.print-report{display:none}
+@media print{body *{visibility:hidden}.print-report,.print-report *{visibility:visible}.print-report{display:block;position:absolute;left:0;top:0;width:100%;padding:0 24px}}
+@media(max-width:560px){.row2{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandlogo" aria-label="InviVote">
+      <svg viewBox="0 0 46 40" width="30" height="26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="7" y="12" width="32" height="24" rx="4" fill="#152A4E"/>
+        <rect x="18" y="6" width="10" height="9" rx="2" transform="rotate(-8 18 6)" fill="#fff" stroke="#152A4E" stroke-width="2"/>
+        <path d="M13 24l4.2 4.2L27 18.5" stroke="#E63558" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="4" y="1" width="7" height="7" rx="1.4" transform="rotate(45 7.5 4.5)" fill="#E63558"/>
+      </svg>
+      <span class="wm"><b>iNVi</b><em>Vote</em></span>
+    </div>
+    <div class="sync" id="sync"><span class="d"></span><span id="syncText">connecting…</span></div>
+    <div class="council">HIGH SCHOOL STUDENT<br>COUNCIL <span id="yearTag">2025-26</span></div>
+    <button class="admin-link" id="adminBtn">Admin</button>
+  </div>
+</div>
+
+<section id="idle">
+  <div class="idle-card">
+    <div id="idleOpen">
+      <div class="vote-word">VOTE</div>
+      <div class="ribbon">Make the change</div>
+      <div class="idle-sub">ELECTION DAY</div>
+      <p class="idle-lead">Tap below to open a fresh ballot. Choose one candidate for each post, then submit.</p>
+      <button class="begin" id="beginBtn">Tap to vote</button>
+    </div>
+    <div id="idleClosed" class="hidden">
+      <div class="vote-word" style="font-size:clamp(40px,10vw,72px)">Voting is closed</div>
+      <div class="closed-note" style="margin-top:20px"><b>The ballot is not open right now.</b><br>Please wait for the supervisor to open voting.</div>
+    </div>
+    <div id="setupWarn" class="setup-warn hidden"></div>
+  </div>
+</section>
+
+<section id="ballot" class="hidden">
+  <div class="wrap">
+    <div class="step-head">
+      <div>
+        <div class="step-kicker">Vote for the post of</div>
+        <h2 id="postTitle">Post</h2>
+        <div class="step-grade" id="postGrade">Grade</div>
+      </div>
+      <div class="step-count" id="stepCount">1 / 4</div>
+    </div>
+    <div class="pbar"><div id="pbarFill"></div></div>
+    <div class="cands" id="cands"></div>
+  </div>
+  <div class="navbar"><div class="navbar-in">
+    <button class="btn btn-ghost" id="backBtn">Back</button>
+    <div class="nav-spacer"></div>
+    <span class="nav-hint" id="navHint">Tap a candidate to select</span>
+    <button class="btn btn-primary" id="nextBtn" disabled>Next</button>
+  </div></div>
+</section>
+
+<section id="review" class="hidden">
+  <div class="wrap">
+    <div class="step-kicker">Last step</div>
+    <h2 style="font-size:clamp(26px,6vw,40px);color:var(--navy)">Check your choices</h2>
+    <p style="color:var(--slate);margin:8px 0 0">Tap “Change” on any row to fix it. Nothing is recorded until you submit.</p>
+    <div class="review-list" id="reviewList"></div>
+  </div>
+  <div class="navbar"><div class="navbar-in">
+    <button class="btn btn-ghost" id="reviewBack">Back</button>
+    <div class="nav-spacer"></div>
+    <button class="btn btn-primary" id="submitBtn">Submit vote</button>
+  </div></div>
+</section>
+
+<section id="done" class="hidden">
+  <div class="done-card">
+    <div class="done-tick">✓</div>
+    <h2>Vote recorded</h2>
+    <div class="finger">Supervisor: mark the voter's finger with ink before the next student.</div>
+    <p class="auto">Returning to the start screen…</p>
+  </div>
+</section>
+
+<section id="admin" class="hidden">
+  <div class="wrap">
+    <div class="admin-head">
+      <h2>Admin</h2><div class="nav-spacer" style="flex:1"></div>
+      <button class="btn-sm btn-line" id="refreshBtn">↻ Refresh</button>
+      <button class="btn-sm btn-line" id="exitAdmin">← Back to voting</button>
+    </div>
+    <div class="tabs">
+      <button class="tab on" data-panel="pControl">Voting</button>
+      <button class="tab" data-panel="pPosts">Posts &amp; candidates</button>
+      <button class="tab" data-panel="pResults">Results</button>
+      <button class="tab" data-panel="pSettings">Settings</button>
+    </div>
+
+    <div class="panel on" id="pControl">
+      <div class="card2">
+        <h3>Voting status</h3>
+        <p class="muted">This is shared across all six computers. Open it once when the day starts; every device sees it.</p>
+        <div class="toggle-row">
+          <label class="switch"><input type="checkbox" id="openToggle"><span class="slider"></span></label>
+          <span class="state-label" id="stateLabel">Closed</span>
+          <div class="nav-spacer" style="flex:1"></div>
+          <span class="muted" style="margin:0" id="ballotsSoFar">— votes cast</span>
+        </div>
+      </div>
+      <div class="card2">
+        <h3>How to run the day</h3>
+        <p class="muted" style="margin:0;line-height:1.7">
+          1. Add each candidate's photo under <b>Posts &amp; candidates</b> (do this once, from any computer — all six get it).<br>
+          2. Open voting here.<br>
+          3. On each computer a student sits, taps <b>Tap to vote</b>, picks one per post, submits.<br>
+          4. Mark the finger with ink, call the next student.<br>
+          5. Close voting and open <b>Results</b> — the total from all six computers is combined automatically.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel" id="pPosts">
+      <div class="card2">
+        <h3>Add a post</h3>
+        <p class="muted">e.g. President, Head Girl, House Captain — Vega.</p>
+        <div class="row2" style="margin-bottom:12px">
+          <div><label class="fld">Post title</label><input type="text" id="newPostTitle" placeholder="President"></div>
+          <div><label class="fld">Grade / group label</label><input type="text" id="newPostGrade" placeholder="Grade XII"></div>
+        </div>
+        <button class="btn-sm btn-navy" id="addPost">Add post</button>
+      </div>
+      <div id="postsAdmin"></div>
+    </div>
+
+    <div class="panel" id="pResults">
+      <div class="stat-strip">
+        <div class="stat-box"><div class="n" id="rVoters">0</div><div class="l">students voted (all devices)</div></div>
+        <div class="stat-box"><div class="n" id="rPosts">0</div><div class="l">posts</div></div>
+        <div class="stat-box"><div class="n" id="rCands">0</div><div class="l">candidates</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="btn-sm btn-navy" id="printBtn">Print director report</button>
+      </div>
+      <div id="resultsArea"></div>
+    </div>
+
+    <div class="panel" id="pSettings">
+      <div class="card2">
+        <h3>Admin PIN</h3>
+        <p class="muted">Protects results and settings from students. Shared across all devices. Change it before the election.</p>
+        <div class="row2" style="margin-bottom:12px">
+          <div><label class="fld">New PIN (4–6 digits)</label><input type="password" id="newPin" inputmode="numeric" maxlength="6" placeholder="••••"></div>
+          <div><label class="fld">Confirm PIN</label><input type="password" id="newPin2" inputmode="numeric" maxlength="6" placeholder="••••"></div>
+        </div>
+        <button class="btn-sm btn-navy" id="savePin">Save PIN</button>
+      </div>
+      <div class="card2">
+        <h3>Council year label</h3>
+        <div class="row2" style="align-items:end">
+          <div><label class="fld">Year</label><input type="text" id="yearLabel" placeholder="2025-26"></div>
+          <div><button class="btn-sm btn-navy" id="saveYear">Save</button></div>
+        </div>
+      </div>
+      <div class="card2">
+        <h3 style="color:var(--red-dark)">Reset all votes</h3>
+        <p class="muted">Clears every ballot from the shared database. Candidates and posts stay. Do this once, just before the real election starts.</p>
+        <button class="btn-sm btn-danger" id="resetVotes">Reset votes to zero</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-bg" id="pinModal"><div class="modal">
+  <h3>Enter admin PIN</h3><p>This area is for the supervising teacher.</p>
+  <input type="password" id="pinInput" inputmode="numeric" maxlength="6" placeholder="Enter PIN" style="text-align:center;font-size:22px;letter-spacing:6px;font-family:var(--head)">
+  <div class="pin-error" id="pinError">Wrong PIN. Try again.</div>
+  <div class="modal-actions"><button class="btn-sm btn-line" id="pinCancel">Cancel</button><button class="btn-sm btn-navy" id="pinOk">Unlock</button></div>
+</div></div>
+
+<div class="modal-bg" id="confirmModal"><div class="modal">
+  <h3 id="confirmTitle">Are you sure?</h3><p id="confirmText">This cannot be undone.</p>
+  <div class="modal-actions"><button class="btn-sm btn-line" id="confirmNo">Cancel</button><button class="btn-sm btn-danger" id="confirmYes">Yes, do it</button></div>
+</div></div>
+
+<footer class="app-foot">
+  <div class="fin">
+    <div class="fbrand"><b style="color:#fff">iNVi</b><em>Vote</em> · Invictus Student Council</div>
+    <div class="fright">
+      <b>Developed by Mohit Sood</b><br>
+      <span>Department of Information Technology</span><br>
+      Invictus International School, Amritsar
+    </div>
+  </div>
+</footer>
+
+<div class="print-report" id="printReport"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   1. PASTE YOUR SUPABASE DETAILS HERE  (from Supabase →
+      Project Settings → API).  Nothing else needs editing.
+   ============================================================ */
+const SUPABASE_URL  = "https://bpjjocfmvtdgklxqrgua.supabase.co";     // e.g. https://abcdefgh.supabase.co
+const SUPABASE_ANON = "sb_publishable_dziP7PuQ9tc5dve69sqZrg_Yj-tOpQj"; // the long "anon public" key
+/* ============================================================ */
+
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const AVATAR_COLORS=['#E63558','#152A4E','#12915E','#C77700','#4351C9','#0B8A5C','#8E44AD','#1E7A9C'];
+const configured = !SUPABASE_URL.includes('PASTE') && !SUPABASE_ANON.includes('PASTE');
+
+async function rpc(fn, args={}){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},
+    body:JSON.stringify(args)
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+function setSync(kind,text){const s=$('#sync');s.className='sync '+kind;$('#syncText').textContent=text;}
+
+let data={is_open:false,year:'2025-26',posts:[],candidates:[]};
+let adminPin=null, adminCache=null;
+
+function initials(n){return n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function colorFor(id){let h=0;for(const ch of (id||'x'))h=(h*31+ch.charCodeAt(0))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
+function photoHTML(c,cls,fbcls){return c.photo?`<img class="${cls}" src="${c.photo}" alt="">`:`<div class="${fbcls}" style="background:${colorFor(c.id)}">${initials(c.name)}</div>`;}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200);}
+function postsSorted_d(d){return [...(d.posts||[])].sort((a,b)=>(a.ord||0)-(b.ord||0));}
+function candsOf_d(d,pid){return (d.candidates||[]).filter(c=>c.post_id===pid);}
+function votersFrom(d){const tally=d.tally||{};let mx=0;postsSorted_d(d).forEach(p=>{const t=candsOf_d(d,p.id).reduce((s,c)=>s+(tally[c.id]||0),0);if(t>mx)mx=t;});return mx;}
+
+const screens=['idle','ballot','review','done','admin'];
+function show(name){screens.forEach(s=>$('#'+s).classList.toggle('hidden',s!==name));window.scrollTo(0,0);}
+
+async function refresh(){
+  if(!configured){
+    setSync('err','not set up');
+    $('#setupWarn').classList.remove('hidden');
+    $('#setupWarn').innerHTML='<b>Almost there.</b> Open this file and paste your Supabase Project URL and anon key at the top of the script, then re-upload. Until then voting is disabled.';
+    $('#idleOpen').classList.add('hidden');$('#idleClosed').classList.add('hidden');
+    return;
+  }
+  try{
+    const d=await rpc('public_bootstrap');
+    data.is_open=d.is_open;data.year=d.year;data.posts=d.posts||[];data.candidates=d.candidates||[];
+    setSync('ok','online');$('#yearTag').textContent=data.year;refreshIdle();
+  }catch(e){setSync('err','offline — check connection');}
+}
+function refreshIdle(){
+  $('#setupWarn').classList.add('hidden');
+  $('#idleOpen').classList.toggle('hidden',!data.is_open);
+  $('#idleClosed').classList.toggle('hidden',data.is_open);
+}
+
+let ballot={order:[],idx:0,choices:{}};
+$('#beginBtn').onclick=async ()=>{
+  await refresh();
+  if(!data.is_open){refreshIdle();return;}
+  ballot={order:postsSorted_d(data).map(p=>p.id),idx:0,choices:{}};
+  if(!ballot.order.length){toast('No posts set up yet.');return;}
+  show('ballot');renderStep();
+};
+function renderStep(){
+  const pid=ballot.order[ballot.idx];
+  const post=data.posts.find(p=>p.id===pid);
+  $('#postTitle').textContent=post.title;
+  $('#postGrade').textContent=post.grade||'';
+  $('#stepCount').textContent=(ballot.idx+1)+' / '+ballot.order.length;
+  $('#pbarFill').style.width=(ballot.idx/ballot.order.length)*100+'%';
+  const list=candsOf_d(data,pid),box=$('#cands');
+  if(!list.length){box.innerHTML='<p class="empty">No candidates for this post yet.</p>';}
+  else{
+    box.innerHTML=list.map(c=>`<button class="cand ${ballot.choices[pid]===c.id?'sel':''}" data-c="${c.id}"><div class="check">✓</div>${photoHTML(c,'photo','ph-fallback')}<div class="nm">${c.name}</div></button>`).join('');
+    box.querySelectorAll('.cand').forEach(b=>b.onclick=()=>{ballot.choices[pid]=b.dataset.c;box.querySelectorAll('.cand').forEach(x=>x.classList.toggle('sel',x===b));updateNav();});
+  }
+  $('#backBtn').textContent=ballot.idx===0?'Cancel':'Back';updateNav();
+}
+function updateNav(){
+  const pid=ballot.order[ballot.idx],chosen=!!ballot.choices[pid],last=ballot.idx===ballot.order.length-1,nb=$('#nextBtn');
+  nb.disabled=!chosen;nb.textContent=last?'Review':'Next';$('#navHint').textContent=chosen?'':'Tap a candidate to select';
+}
+$('#nextBtn').onclick=()=>{if($('#nextBtn').disabled)return;if(ballot.idx<ballot.order.length-1){ballot.idx++;renderStep();}else renderReview();};
+$('#backBtn').onclick=()=>{if(ballot.idx===0){show('idle');refreshIdle();}else{ballot.idx--;renderStep();}};
+
+function renderReview(){
+  show('review');
+  $('#reviewList').innerHTML=ballot.order.map(pid=>{
+    const post=data.posts.find(p=>p.id===pid);
+    const c=data.candidates.find(x=>x.id===ballot.choices[pid]);
+    const who=c?photoHTML(c,'rp','rp-fb'):'<div class="rp-fb" style="background:#C6D0E0">–</div>';
+    return `<div class="review-row">${who}<div class="meta"><div class="post">${post.title}</div><div class="who ${c?'':'none'}">${c?c.name:'Not selected'}</div></div><button class="edit" data-pid="${pid}">Change</button></div>`;
+  }).join('');
+  $('#reviewList').querySelectorAll('.edit').forEach(b=>b.onclick=()=>{ballot.idx=ballot.order.indexOf(b.dataset.pid);show('ballot');renderStep();});
+}
+$('#reviewBack').onclick=()=>{ballot.idx=ballot.order.length-1;show('ballot');renderStep();};
+$('#submitBtn').onclick=async ()=>{
+  const btn=$('#submitBtn');btn.disabled=true;btn.textContent='Submitting…';
+  const choices=ballot.order.map(pid=>ballot.choices[pid]).filter(Boolean);
+  try{
+    const r=await rpc('cast_ballot',{choices});
+    if(r&&r.ok===false&&r.error==='closed'){toast('Voting has been closed.');show('idle');await refresh();}
+    else{show('done');setTimeout(()=>{show('idle');refreshIdle();},3500);}
+  }catch(e){toast('Could not save — check connection and try again.');}
+  btn.disabled=false;btn.textContent='Submit vote';
+};
+
+$('#adminBtn').onclick=()=>{if(!configured){toast('Add your Supabase details first.');return;}$('#pinInput').value='';$('#pinError').style.display='none';$('#pinModal').classList.add('on');setTimeout(()=>$('#pinInput').focus(),50);};
+$('#pinCancel').onclick=()=>$('#pinModal').classList.remove('on');
+$('#pinOk').onclick=tryPin;
+$('#pinInput').addEventListener('keydown',e=>{if(e.key==='Enter')tryPin();});
+async function tryPin(){
+  const pin=$('#pinInput').value;
+  try{
+    const d=await rpc('admin_data',{p_pin:pin});
+    if(d.ok===false){$('#pinError').style.display='block';return;}
+    adminPin=pin;$('#pinModal').classList.remove('on');openAdmin(d);
+  }catch(e){toast('Connection problem. Try again.');}
+}
+function openAdmin(d){adminCache=d;show('admin');$('#yearLabel').value=d.year;renderControl(d);renderPostsAdmin(d);renderResults(d);}
+$('#exitAdmin').onclick=()=>{show('idle');refresh();};
+$('#refreshBtn').onclick=async ()=>{const d=await rpc('admin_data',{p_pin:adminPin});openAdmin(d);toast('Refreshed.');};
+$$('.tab').forEach(t=>t.onclick=async ()=>{
+  $$('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  $$('.panel').forEach(p=>p.classList.toggle('on',p.id===t.dataset.panel));
+  if(t.dataset.panel==='pResults'){const d=await rpc('admin_data',{p_pin:adminPin});renderResults(d);}
+});
+
+function renderControl(d){
+  $('#openToggle').checked=d.is_open;
+  const sl=$('#stateLabel');sl.textContent=d.is_open?'Open':'Closed';sl.className='state-label '+(d.is_open?'open':'closed');
+  const v=votersFrom(d);$('#ballotsSoFar').textContent=v+' student'+(v===1?'':'s')+' voted';
+}
+$('#openToggle').onchange=async e=>{
+  try{await rpc('admin_set_open',{p_pin:adminPin,p_open:e.target.checked});adminCache.is_open=e.target.checked;renderControl(adminCache);toast(e.target.checked?'Voting opened':'Voting closed');}
+  catch(err){toast('Failed — try again.');e.target.checked=!e.target.checked;}
+};
+
+function renderPostsAdmin(d){
+  const box=$('#postsAdmin'),ps=postsSorted_d(d);
+  if(!ps.length){box.innerHTML='<p class="empty">No posts yet. Add one above.</p>';return;}
+  box.innerHTML=ps.map(p=>{
+    const cs=candsOf_d(d,p.id);
+    return `<div class="post-block">
+      <div class="ph"><div class="t">${p.title}</div><div class="g">${p.grade||''}</div>
+      <button class="del btn-line btn-sm" data-delpost="${p.id}" style="padding:6px 12px">Delete post</button></div>
+      <div class="cand-admin">${cs.map(c=>`<div class="ca">${photoHTML(c,'cap','cap-fb')}<div class="cn" title="${c.name}">${c.name}</div>
+        <label class="up">Photo<input type="file" accept="image/*" data-photo="${c.id}" style="display:none"></label>
+        <button class="del" data-delcand="${c.id}" title="Remove">✕</button></div>`).join('')||'<p class="muted" style="margin:0">No candidates yet.</p>'}</div>
+      <div class="add-cand"><input type="text" placeholder="Candidate name" data-newcand="${p.id}"><button class="btn-sm btn-navy" data-addcand="${p.id}">Add</button></div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('[data-delpost]').forEach(b=>b.onclick=()=>askConfirm('Delete this post?','Its candidates and their votes will be removed on every device.',async()=>{await rpc('admin_del_post',{p_pin:adminPin,p_id:b.dataset.delpost});reloadAdmin();}));
+  box.querySelectorAll('[data-delcand]').forEach(b=>b.onclick=async()=>{await rpc('admin_del_candidate',{p_pin:adminPin,p_id:b.dataset.delcand});reloadAdmin();});
+  box.querySelectorAll('[data-addcand]').forEach(b=>b.onclick=async()=>{const inp=box.querySelector(`[data-newcand="${b.dataset.addcand}"]`);const nm=inp.value.trim();if(!nm)return;await rpc('admin_add_candidate',{p_pin:adminPin,p_post:b.dataset.addcand,p_name:nm});reloadAdmin();});
+  box.querySelectorAll('[data-newcand]').forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter')box.querySelector(`[data-addcand="${inp.dataset.newcand}"]`).click();}));
+  box.querySelectorAll('[data-photo]').forEach(inp=>inp.onchange=()=>handlePhoto(inp));
+}
+$('#addPost').onclick=async()=>{
+  const t=$('#newPostTitle').value.trim();if(!t)return;const g=$('#newPostGrade').value.trim();
+  await rpc('admin_add_post',{p_pin:adminPin,p_title:t,p_grade:g});
+  $('#newPostTitle').value='';$('#newPostGrade').value='';reloadAdmin();toast('Post added');
+};
+async function reloadAdmin(){const d=await rpc('admin_data',{p_pin:adminPin});adminCache=d;renderPostsAdmin(d);renderControl(d);}
+
+function handlePhoto(inp){
+  const file=inp.files[0];if(!file)return;const cid=inp.dataset.photo;
+  const reader=new FileReader();
+  reader.onload=e=>{const img=new Image();img.onload=async()=>{
+    const size=300,canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;
+    const ctx=canvas.getContext('2d'),s=Math.min(img.width,img.height),sx=(img.width-s)/2,sy=(img.height-s)/2;
+    ctx.drawImage(img,sx,sy,s,s,0,0,size,size);
+    const url=canvas.toDataURL('image/jpeg',0.78);
+    try{await rpc('admin_set_photo',{p_pin:adminPin,p_id:cid,p_photo:url});reloadAdmin();toast('Photo saved');}
+    catch(err){toast('Photo failed. Try a smaller image.');}
+  };img.src=e.target.result;};
+  reader.readAsDataURL(file);
+}
+
+function renderResults(d){
+  $('#rVoters').textContent=votersFrom(d);
+  $('#rPosts').textContent=(d.posts||[]).length;
+  $('#rCands').textContent=(d.candidates||[]).length;
+  const area=$('#resultsArea'),ps=postsSorted_d(d),tally=d.tally||{};
+  if(!ps.length){area.innerHTML='<p class="empty">Nothing to show yet.</p>';return;}
+  area.innerHTML=ps.map(p=>{
+    const cs=candsOf_d(d,p.id).map(c=>({...c,v:tally[c.id]||0}));
+    const total=cs.reduce((s,c)=>s+c.v,0),max=Math.max(1,...cs.map(c=>c.v)),topV=Math.max(0,...cs.map(c=>c.v));
+    return `<div class="res-post"><h3>${p.title}</h3><div class="rg">${p.grade||''} · ${total} vote${total===1?'':'s'}</div>
+      ${cs.sort((a,b)=>b.v-a.v).map(c=>{const win=c.v===topV&&topV>0,pct=total?Math.round(c.v/total*100):0;
+        return `<div class="res-bar"><div class="rl"><span class="rn">${c.name}${win?'<span class="win">● leading</span>':''}</span><span class="rv">${c.v} · ${pct}%</span></div><div class="res-track"><div class="res-fill ${win?'win':''}" style="width:${(c.v/max)*100}%"></div></div></div>`;}).join('')}
+    </div>`;
+  }).join('');
+}
+
+$('#printBtn').onclick=async()=>{
+  const d=await rpc('admin_data',{p_pin:adminPin});
+  const ps=postsSorted_d(d),tally=d.tally||{},voters=votersFrom(d);
+  let html=`<div style="font-family:Poppins,sans-serif"><div style="text-align:center;border-bottom:3px solid #152A4E;padding-bottom:14px;margin-bottom:20px">
+    <div style="font-size:24px;font-weight:800;color:#152A4E">iNVICTUS — High School Student Council ${d.year}</div>
+    <div style="font-size:16px;color:#E63558;font-weight:700;margin-top:4px">Election Results Report</div>
+    <div style="font-size:12px;color:#5E6E8A;margin-top:6px">Generated ${new Date().toLocaleString('en-IN')} · Students voted: ${voters}</div></div>`;
+  ps.forEach(p=>{
+    const cs=candsOf_d(d,p.id).map(c=>({...c,v:tally[c.id]||0})).sort((a,b)=>b.v-a.v);
+    const total=cs.reduce((s,c)=>s+c.v,0),winner=cs[0]&&cs[0].v>0?cs[0].name:'—';
+    html+=`<div style="margin-bottom:22px;page-break-inside:avoid"><div style="font-size:18px;font-weight:700;color:#152A4E">${p.title} <span style="font-weight:400;color:#5E6E8A;font-size:14px">(${p.grade||''})</span></div>
+      <div style="font-size:13px;color:#12915E;font-weight:700;margin:2px 0 8px">Winner: ${winner}</div>
+      <table style="width:100%;border-collapse:collapse;font-family:Inter,sans-serif;font-size:13px"><tr style="background:#152A4E;color:#fff"><th style="text-align:left;padding:7px 10px">Candidate</th><th style="text-align:right;padding:7px 10px">Votes</th><th style="text-align:right;padding:7px 10px">Share</th></tr>
+      ${cs.map((c,i)=>`<tr style="border-bottom:1px solid #DBE2ED;${i===0&&c.v>0?'font-weight:700':''}"><td style="padding:7px 10px">${c.name}${i===0&&c.v>0?' ★':''}</td><td style="padding:7px 10px;text-align:right">${c.v}</td><td style="padding:7px 10px;text-align:right">${total?Math.round(c.v/total*100):0}%</td></tr>`).join('')}</table></div>`;
+  });
+  html+=`<div style="margin-top:30px;font-size:12px;color:#5E6E8A;border-top:1px solid #DBE2ED;padding-top:10px">Voting was supervised across six terminals; double voting prevented by indelible ink marking. Report prepared for the Director.</div></div>`;
+  $('#printReport').innerHTML=html;window.print();
+};
+
+$('#savePin').onclick=async()=>{
+  const a=$('#newPin').value,b=$('#newPin2').value;
+  if(a.length<4){toast('PIN should be at least 4 digits.');return;}
+  if(a!==b){toast('The two PINs do not match.');return;}
+  await rpc('admin_set_pin',{p_pin:adminPin,p_new:a});adminPin=a;
+  $('#newPin').value='';$('#newPin2').value='';toast('PIN updated.');
+};
+$('#saveYear').onclick=async()=>{
+  const y=$('#yearLabel').value.trim();if(!y)return;
+  await rpc('admin_set_year',{p_pin:adminPin,p_year:y});
+  $('#yearTag').textContent=y;toast('Saved.');
+};
+$('#resetVotes').onclick=()=>askConfirm('Reset all votes?','Every ballot in the shared database goes back to zero. Candidates and posts are kept.',async()=>{
+  await rpc('admin_reset_votes',{p_pin:adminPin});const d=await rpc('admin_data',{p_pin:adminPin});adminCache=d;renderResults(d);renderControl(d);toast('Votes reset.');});
+
+let confirmFn=null;
+function askConfirm(title,text,fn){$('#confirmTitle').textContent=title;$('#confirmText').textContent=text;confirmFn=fn;$('#confirmModal').classList.add('on');}
+$('#confirmNo').onclick=()=>$('#confirmModal').classList.remove('on');
+$('#confirmYes').onclick=()=>{$('#confirmModal').classList.remove('on');if(confirmFn)confirmFn();};
+
+show('idle');
+refresh();
+setInterval(()=>{if($('#idle').offsetParent!==null)refresh();},20000);
+</script>
+</body>
+</html>
