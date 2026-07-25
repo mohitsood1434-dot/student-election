@@ -28,15 +28,16 @@ button{font-family:var(--body);cursor:pointer;border:none}
 .brandlogo .wm{font-family:var(--head);font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1}
 .brandlogo .wm b{color:var(--navy);font-weight:800}
 .brandlogo .wm em{color:var(--red);font-style:normal;font-weight:800}
-footer.app-foot{background:var(--navy);color:#AEBDD4;padding:34px 0 30px;margin-top:auto}
-footer.app-foot .fin{max-width:1000px;margin:0 auto;padding:0 20px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
-footer.app-foot .fbrand{font-family:var(--head);font-weight:800;font-size:20px;letter-spacing:-.02em;color:#fff}
-footer.app-foot .fbrand em{color:var(--red);font-style:normal}
-footer.app-foot .fright{text-align:right;font-size:13px;line-height:1.6}
-footer.app-foot .fright b{color:#fff;font-family:var(--head);font-weight:700;font-size:14px}
-footer.app-foot .fright span{color:#E63558;font-weight:600}
+footer.app-foot{background:var(--navy);color:#9DAAC2;padding:30px 0 28px;margin-top:auto}
+footer.app-foot .fin{max-width:1000px;margin:0 auto;padding:0 20px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+footer.app-foot .fbrand{font-family:var(--head);font-weight:600;font-size:17px;letter-spacing:-.01em;color:#E7ECF4}
+footer.app-foot .fbrand em{color:var(--red);font-style:normal;font-weight:700}
+footer.app-foot .fright{text-align:right;font-size:13px;line-height:1.65}
+footer.app-foot .fright b{color:#EEF2F8;font-family:var(--head);font-weight:600;font-size:13.5px}
+footer.app-foot .fright span{color:#B6C2D6;font-weight:500}
 @media(max-width:560px){footer.app-foot .fin{flex-direction:column;align-items:flex-start}footer.app-foot .fright{text-align:left}}
 .council{margin-left:auto;font-family:var(--head);font-weight:700;font-size:12px;color:var(--slate);text-align:right;line-height:1.2}
+@media(max-width:680px){.council{display:none}#syncText{display:none}.brandlogo .wm{font-size:19px}.topbar-in{gap:8px}.admin-link{margin-left:auto}}
 .council span{color:var(--red)}
 .admin-link{margin-left:14px;background:var(--bg);border:1px solid var(--line);color:var(--slate);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600}
 .admin-link:hover{color:var(--ink)}
@@ -365,7 +366,7 @@ input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px}
    1. PASTE YOUR SUPABASE DETAILS HERE  (from Supabase →
       Project Settings → API).  Nothing else needs editing.
    ============================================================ */
-const SUPABASE_URL  = "https://bpjjocfmvtdgklxqrgua.supabase.co";     // e.g. https://abcdefgh.supabase.co
+const SUPABASE_URL  = "bpjjocfmvtdgklxqrgua.supabase.co";     // e.g. https://abcdefgh.supabase.co
 const SUPABASE_ANON = "sb_publishable_dziP7PuQ9tc5dve69sqZrg_Yj-tOpQj"; // the long "anon public" key
 /* ============================================================ */
 
