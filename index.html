@@ -333,7 +333,7 @@ input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px}
         </div>
         <div class="row2" style="margin-bottom:12px">
           <div><label class="fld">House</label><select id="newPostHouse"><option value="">All houses</option><option>Vega</option><option>Sirius</option><option>Polaris</option><option>Atlas</option></select></div>
-          <div><label class="fld">Wing</label><select id="newPostWing"><option>Primary</option><option>Middle</option><option>Senior</option></select></div>
+          <div><label class="fld">Wing</label><select id="newPostWing"><option>Whole school</option><option>Primary</option><option>Middle</option><option>Senior</option></select></div>
         </div>
         <button class="btn-sm btn-navy" id="addPost">Add post</button>
       </div>
@@ -437,13 +437,19 @@ async function attachMeta(d){
   try{
     const [meta,w]=await Promise.all([rpc('post_meta'),rpc('wing_now')]);
     const m={};(meta||[]).forEach(x=>m[x.id]=x);
-    (d.posts||[]).forEach(p=>{const x=m[p.id]||{};p.house=x.house||null;p.wing=x.wing||'Senior';});
+    (d.posts||[]).forEach(p=>{const x=m[p.id]||{};p.house=x.house||null;p.wing=x.wing||'Senior';p.picks=Math.max(1,x.picks||1);});
     d.active_wing=w||'Primary';
   }catch(e){d.active_wing=d.active_wing||'Primary';}
   return d;
 }
-function postsForWing(d,wing){return postsSorted_d(d).filter(p=>(p.wing||'Senior')===wing);}
-function ballotPosts(house){return postsForWing(data,data.active_wing).filter(p=>!p.house||p.house===house);}
+function postsForWing(d,wing){return postsSorted_d(d).filter(p=>{const w=p.wing||'Senior';return w===wing||w===ALLW;});}
+function ballotPosts(house){
+  const ps=postsForWing(data,data.active_wing).filter(p=>!p.house||p.house===house);
+  return ps.sort((a,b)=>{
+    const rank=p=>((p.wing===ALLW)?0:(p.house?2:1));
+    return rank(a)-rank(b)||(a.ord||0)-(b.ord||0);
+  });
+}
 function wingNeedsHouse(){return postsForWing(data,data.active_wing).some(p=>!!p.house);}
 function setSync(kind,text){const s=$('#sync');s.className='sync '+kind;$('#syncText').textContent=text;}
 
@@ -459,7 +465,8 @@ function candsOf_d(d,pid){return (d.candidates||[]).filter(c=>c.post_id===pid);}
 function votersFrom(d){const tally=d.tally||{};let mx=0;postsSorted_d(d).forEach(p=>{const t=candsOf_d(d,p.id).reduce((s,c)=>s+(tally[c.id]||0),0);if(t>mx)mx=t;});return mx;}
 
 const HOUSES=[{name:'Vega',color:'#6B2FA0'},{name:'Sirius',color:'#1E7FC4'},{name:'Polaris',color:'#E8B400'},{name:'Atlas',color:'#14A0A8'}];
-const WINGS=['Primary','Middle','Senior'];
+const ALLW='Whole school';
+const WINGS=[ALLW,'Primary','Middle','Senior'];
 const screens=['idle','house','ballot','review','done','admin'];
 function show(name){screens.forEach(s=>$('#'+s).classList.toggle('hidden',s!==name));window.scrollTo(0,0);}
 
@@ -515,14 +522,29 @@ function renderStep(){
   const list=candsOf_d(data,pid),box=$('#cands');
   if(!list.length){box.innerHTML='<p class="empty">No candidates for this post yet.</p>';}
   else{
-    box.innerHTML=list.map(c=>`<button class="cand ${ballot.choices[pid]===c.id?'sel':''}" data-c="${c.id}"><div class="check">✓</div>${photoHTML(c,'photo','ph-fallback')}<div class="nm">${c.name}</div></button>`).join('');
-    box.querySelectorAll('.cand').forEach(b=>b.onclick=()=>{ballot.choices[pid]=b.dataset.c;box.querySelectorAll('.cand').forEach(x=>x.classList.toggle('sel',x===b));updateNav();});
+    const picks=Math.max(1,post.picks||1),sel=ballot.choices[pid]||[];
+    box.innerHTML=list.map(c=>`<button class="cand ${sel.includes(c.id)?'sel':''}" data-c="${c.id}"><div class="check">✓</div>${photoHTML(c,'photo','ph-fallback')}<div class="nm">${c.name}</div></button>`).join('');
+    box.querySelectorAll('.cand').forEach(b=>b.onclick=()=>{
+      let cur=(ballot.choices[pid]||[]).slice();
+      if(picks===1){cur=[b.dataset.c];}
+      else if(cur.includes(b.dataset.c)){cur=cur.filter(x=>x!==b.dataset.c);}
+      else if(cur.length<picks){cur.push(b.dataset.c);}
+      else{toast('You can choose only '+picks+'. Tap one to remove it first.');return;}
+      ballot.choices[pid]=cur;
+      box.querySelectorAll('.cand').forEach(x=>x.classList.toggle('sel',cur.includes(x.dataset.c)));
+      updateNav();
+    });
   }
   $('#backBtn').textContent=ballot.idx===0?'Cancel':'Back';updateNav();
 }
 function updateNav(){
-  const pid=ballot.order[ballot.idx],chosen=!!ballot.choices[pid],last=ballot.idx===ballot.order.length-1,nb=$('#nextBtn');
-  nb.disabled=!chosen;nb.textContent=last?'Review':'Next';$('#navHint').textContent=chosen?'':'Tap a candidate to select';
+  const pid=ballot.order[ballot.idx],post=data.posts.find(p=>p.id===pid)||{};
+  const picks=Math.max(1,post.picks||1),n=(ballot.choices[pid]||[]).length;
+  const last=ballot.idx===ballot.order.length-1,nb=$('#nextBtn');
+  nb.disabled=n===0;nb.textContent=last?'Review':'Next';
+  $('#navHint').textContent = picks>1
+    ? (n===0?'Choose '+picks+' candidates':(n<picks?'Choose '+(picks-n)+' more, or tap Next':'Both chosen'))
+    : (n?'':'Tap a candidate to select');
 }
 $('#nextBtn').onclick=()=>{if($('#nextBtn').disabled)return;if(ballot.idx<ballot.order.length-1){ballot.idx++;renderStep();}else renderReview();};
 $('#backBtn').onclick=()=>{
@@ -534,18 +556,19 @@ function renderReview(){
   show('review');
   $('#reviewList').innerHTML=ballot.order.map(pid=>{
     const post=data.posts.find(p=>p.id===pid);
-    const c=data.candidates.find(x=>x.id===ballot.choices[pid]);
-    const who=c?photoHTML(c,'rp','rp-fb'):'<div class="rp-fb" style="background:#C6D0E0">–</div>';
-    return `<div class="review-row">${who}<div class="meta"><div class="post">${post.title}${post.house?' — '+post.house:''}</div><div class="who ${c?'':'none'}">${c?c.name:'Not selected'}</div></div><button class="edit" data-pid="${pid}">Change</button></div>`;
+    const picked=(ballot.choices[pid]||[]).map(id=>data.candidates.find(x=>x.id===id)).filter(Boolean);
+    const who=picked.length?photoHTML(picked[0],'rp','rp-fb'):'<div class="rp-fb" style="background:#C6D0E0">–</div>';
+    const names=picked.length?picked.map(c=>c.name).join(' + '):'Not selected';
+    return `<div class="review-row">${who}<div class="meta"><div class="post">${post.title}${post.house?' — '+post.house:''}</div><div class="who ${picked.length?'':'none'}">${names}</div></div><button class="edit" data-pid="${pid}">Change</button></div>`;
   }).join('');
   $('#reviewList').querySelectorAll('.edit').forEach(b=>b.onclick=()=>{ballot.idx=ballot.order.indexOf(b.dataset.pid);show('ballot');renderStep();});
 }
 $('#reviewBack').onclick=()=>{ballot.idx=ballot.order.length-1;show('ballot');renderStep();};
 $('#submitBtn').onclick=async ()=>{
   const btn=$('#submitBtn');btn.disabled=true;btn.textContent='Submitting…';
-  const choices=ballot.order.map(pid=>ballot.choices[pid]).filter(Boolean);
+  const choices=ballot.order.flatMap(pid=>ballot.choices[pid]||[]);
   try{
-    const r=await rpc('cast_ballot',{choices});
+    const r=await rpc('cast_ballot_multi',{p_choices:choices});
     if(r&&r.ok===false&&r.error==='closed'){toast('Voting has been closed.');show('idle');await refresh();}
     else{show('done');setTimeout(()=>{show('idle');refreshIdle();},3500);}
   }catch(e){toast('Could not save — check connection and try again.');}
@@ -604,13 +627,15 @@ function renderPostsAdmin(d){
   box.innerHTML=ps.map(p=>{
     const cs=candsOf_d(d,p.id);
     return `<div class="post-block">
-      <div class="ph"><div class="t">${p.title}${p.house?`<span class="tagpill">${p.house}</span>`:''}</div><div class="g">${p.grade||''} · ${p.wing||'Senior'}</div>
+      <div class="ph"><div class="t">${p.title}${p.house?`<span class="tagpill">${p.house}</span>`:''}</div><div class="g">${p.grade||''} · ${p.wing||'Senior'}${(p.picks||1)>1?' · choose '+p.picks:''}</div>
       <button class="del btn-line btn-sm" data-delpost="${p.id}" style="padding:6px 12px">Delete post</button></div>
       <div class="meta-row">
         <span class="lbl">House</span>
         <select data-house="${p.id}"><option value="">All houses</option>${HOUSES.map(h=>`<option ${p.house===h.name?'selected':''}>${h.name}</option>`).join('')}</select>
         <span class="lbl">Wing</span>
         <select data-wing="${p.id}">${WINGS.map(w=>`<option ${(p.wing||'Senior')===w?'selected':''}>${w}</option>`).join('')}</select>
+        <span class="lbl">Choose</span>
+        <select data-picks="${p.id}">${[1,2,3].map(n=>`<option ${Math.max(1,p.picks||1)===n?'selected':''}>${n}</option>`).join('')}</select>
       </div>
       <div class="cand-admin">${cs.map(c=>`<div class="ca">${photoHTML(c,'cap','cap-fb')}<div class="cn" title="${c.name}">${c.name}</div>
         <label class="up">Photo<input type="file" accept="image/*" data-photo="${c.id}" style="display:none"></label>
@@ -626,11 +651,13 @@ function renderPostsAdmin(d){
   const saveMeta=async id=>{
     const h=box.querySelector(`[data-house="${id}"]`).value;
     const w=box.querySelector(`[data-wing="${id}"]`).value;
-    try{await rpc('admin_set_post_meta',{p_pin:adminPin,p_id:id,p_house:h,p_wing:w});reloadAdmin();toast('Saved');}
+    const k=parseInt(box.querySelector(`[data-picks="${id}"]`).value,10)||1;
+    try{await rpc('admin_set_post_meta',{p_pin:adminPin,p_id:id,p_house:h,p_wing:w,p_picks:k});reloadAdmin();toast('Saved');}
     catch(e){toast('Could not save. Try again.');}
   };
   box.querySelectorAll('[data-house]').forEach(s=>s.onchange=()=>saveMeta(s.dataset.house));
   box.querySelectorAll('[data-wing]').forEach(s=>s.onchange=()=>saveMeta(s.dataset.wing));
+  box.querySelectorAll('[data-picks]').forEach(s=>s.onchange=()=>saveMeta(s.dataset.picks));
 }
 $('#addPost').onclick=async()=>{
   const t=$('#newPostTitle').value.trim();if(!t)return;const g=$('#newPostGrade').value.trim();
@@ -639,7 +666,7 @@ $('#addPost').onclick=async()=>{
   try{
     const fresh=await rpc('admin_data',{p_pin:adminPin});
     const made=(fresh.posts||[]).slice().sort((a,b)=>(b.ord||0)-(a.ord||0))[0];
-    if(made) await rpc('admin_set_post_meta',{p_pin:adminPin,p_id:made.id,p_house:h,p_wing:w});
+    if(made) await rpc('admin_set_post_meta',{p_pin:adminPin,p_id:made.id,p_house:h,p_wing:w,p_picks:h?2:1});
   }catch(e){}
   $('#newPostTitle').value='';$('#newPostGrade').value='';reloadAdmin();toast('Post added');
 };
